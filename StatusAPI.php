@@ -77,7 +77,7 @@ class StatusAPI {
             $id = $c['id'];
             $name = $c['name'];
             $link = $c['link'];
-            $status = $c['status'];
+            $status = intval($c['status']);
             $enabled = $c['enabled'];
             $timeDiff = $c['timeDiff'];
             $downtime = $c['downtime'];
@@ -230,11 +230,6 @@ class StatusAPI {
     public function updateStatus($component, $status, $prevStatus, $time)
     {
 
-        // If we have some performance issues, we don't wanna count them as downtime, because they are just slow responses
-        if($status === ServiceStatus::PERFORMANCE_ISSUES) {
-            $time = 0;
-        }
-
         // update component -> set the new status & update the downtime if necessary
         $stmt = $this->pdo->prepare(
             'UPDATE `components` SET `status` = :status, `downtime` = :downtime, `updated_at` = NOW() WHERE `id` = :component;'
@@ -242,7 +237,7 @@ class StatusAPI {
         $stmt->execute(array(
             ':component'    => $component,
             ':status'       => $status,
-            ':downtime'     => $time
+            ':downtime'     => ($status === ServiceStatus::PERFORMANCE_ISSUES ? 0 : $time)
         ));
 
         // Dealing with incidents now...
@@ -256,7 +251,7 @@ class StatusAPI {
 
 
         $inCooldown = $stmt->rowCount() === 1;
-        $cooldownTime = ($inCooldown ? $stmt->fetch()['cooldownTime'] : 0);
+        $cooldownTime = ($inCooldown ? intval($stmt->fetch()['cooldownTime']) : 0);
 
         // If
         //  the current status is NOT OPERATIONAL
@@ -265,7 +260,7 @@ class StatusAPI {
         // then is the service not available.
         if (
             !($status === ServiceStatus::OPERATIONAL) &&
-            $status === ServiceStatus::OPERATIONAL &&
+            $prevStatus === ServiceStatus::OPERATIONAL &&
             !($inCooldown)
         ) {
 
@@ -282,7 +277,7 @@ class StatusAPI {
 
             // status 2 -> open
             $stmt = $this->pdo->prepare(
-                'INSERT INTO `incidents` (`component_id`, `name`, `status`, `visible`, `message`, `created_at`, `updated_at`) VALUES (:id, :statusTitle, 2, TRUE, :message, NOW(), NOW()));'
+                'INSERT INTO `incidents` (`component_id`, `name`, `status`, `visible`, `message`, `created_at`, `updated_at`) VALUES (:id, :statusTitle, 2, TRUE, :message, NOW(), NOW());'
             );
             $stmt->execute(array(
                 ':id' => $component,
@@ -346,7 +341,7 @@ class StatusAPI {
             // status 3 -> watching (aka. cooldown)
             // We are updating it to prevent it from going into the cooldown mode.
             $stmt = $this->pdo->prepare(
-                'UPDATE `incidents` SET `updated_at` = NOW() WHERE `component_id` = :id AND `status` = 2;'
+                'UPDATE `incidents` SET `updated_at` = NOW(), `status` = 2 WHERE `component_id` = :id AND `status` = 3;'
             );
             $stmt->execute(array(
                 ':id' => $component,
