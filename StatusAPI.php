@@ -199,7 +199,7 @@ class StatusAPI {
         // 2 -> Website Metrics
         // 3 -> Public Universe Metrics
         // Multiply everything with 1000 to get the time in ms.
-        $this->addMetricsPoint(1, $websiteAvg * 1000);
+        $this->addMetricsPoint(1, $webseedAvg * 1000);
         $this->addMetricsPoint(2, $websiteAvg * 1000);
         $this->addMetricsPoint(3, $publicUniverseAvg * 1000);
 
@@ -237,14 +237,13 @@ class StatusAPI {
 
         // update component -> set the new status & update the downtime if necessary
         $stmt = $this->pdo->prepare(
-            'UPDATE `components` SET `status` = :status, `downtime` = :downtime WHERE `id` = :component;'
+            'UPDATE `components` SET `status` = :status, `downtime` = :downtime, `updated_at` = NOW() WHERE `id` = :component;'
         );
         $stmt->execute(array(
-            ':component' => $component,
-            ':status' => $status,
-            ':downtime' => $time
+            ':component'    => $component,
+            ':status'       => $status,
+            ':downtime'     => $time
         ));
-
 
         // Dealing with incidents now...
         // checking if one incident is still open/cooldown mode
