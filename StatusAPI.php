@@ -20,7 +20,7 @@ class StatusAPI {
 
     public function __construct($config) {
 
-        if(!(file_exists($config)) || !(substr($config, -4) === '.env')) {
+        if(!(file_exists($config)) || !(substr($config, -4) === '.ini')) {
             throw new \InvalidArgumentException('Invalid config file provided.');
         }
 
