@@ -106,10 +106,10 @@ class StatusAPI {
 
                 $curl = curl_init();
                 curl_setopt_array($curl, array(
-                    CURLOPT_URL             => $link,
-                    CURLOPT_RETURNTRANSFER  => true,
-                    CURLOPT_NOBODY          => true,
-                    CURLOPT_TIMEOUT         => 10,
+                    CURLOPT_URL => $link,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_NOBODY => true,
+                    CURLOPT_TIMEOUT => 10,
                 ));
                 curl_exec($curl);
 
@@ -119,7 +119,7 @@ class StatusAPI {
                 $responseTime = curl_getinfo($curl, CURLINFO_TOTAL_TIME);
 
             }
-            // we are a non-HTTP service, use fping
+            // we are a non-HTTP service, use fping, but it is also not a AWS (Amazon's Web Service)
             else {
 
                 // cachet forces me to store all links with HTTP(s) at the beginnig,
@@ -134,7 +134,13 @@ class StatusAPI {
                 // we need to get rid of old data in strdout; the length of "one" entry is 19 entries in one array (already tested that)
                 $data = array_slice($output, -19);
 
-                $available = (trim($data[5]) == '1 alive');
+                // special case: the PTU servers are not available to the public, we have to use another way to validate if they are online or not
+                if($host === 'ptu.universe.robertsspaceindustries.com') {
+                    $available = (trim($data[8])=== '1 timeouts (waiting for response)');
+                } else {
+                    $available = (trim($data[5]) === '1 alive');
+                }
+
                 $responseTime = doubleval(substr(trim($data[17]), 0, 4));
 
             }
