@@ -71,6 +71,9 @@ class StatusAPI {
         // get all components
         $components = $this->getComponents();
 
+        // delta time
+        $lastIteration = time();
+
         foreach ($components as $c) {
 
             // easier access
@@ -169,7 +172,8 @@ class StatusAPI {
             else {
                 // timeDiff     -> Time since the last status update
                 // deltaTime    -> Time between timeDiff and now
-                $downtime += ($timeDiff + (time() - $timeDiff));
+                $downtime += ($timeDiff + (time() - $lastIteration));
+                $lastIteration = time();
             }
 
             // determine the next status based on its downtime
