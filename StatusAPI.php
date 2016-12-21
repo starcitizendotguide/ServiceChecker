@@ -283,7 +283,7 @@ class StatusAPI {
 
             // status 2 -> open
             $stmt = $this->pdo->prepare(
-                'INSERT INTO `incidents` (`component_id`, `name`, `status`, `visible`, `message`, `created_at`, `updated_at` VALUES (:id, :statusTitle, 2, TRUE, :message, NOW(), NOW()));'
+                'INSERT INTO `incidents` (`component_id`, `name`, `status`, `visible`, `message`, `created_at`, `updated_at`) VALUES (:id, :statusTitle, 2, TRUE, :message, NOW(), NOW()));'
             );
             $stmt->execute(array(
                 ':id' => $component,
