@@ -134,20 +134,8 @@ class StatusAPI {
                 // we need to get rid of old data in strdout; the length of "one" entry is 19 entries in one array (already tested that)
                 $data = array_slice($output, -19);
 
-                // special case: the PTU servers are not available to the public, we have to use another way to validate if they are online or not
-                if($host === 'ptu.universe.robertsspaceindustries.com') {
-                    $available = (trim($data[8]) === '1 timeouts (waiting for response)');
-                    $responseTime = doubleval(substr(trim($data[16]), 0, 4));
-                } else {
-                    $available = (trim($data[5]) === '1 alive');
-                    $responseTime = doubleval(substr(trim($data[16]), 0, 4));
-                }
-
-                file_put_contents('/cronjobs/test.log', json_encode(array(
-                    'host' => $host,
-                    'available' => $available,
-                    'responseTime' => $responseTime
-                )));
+                $available = (trim($data[5]) == '1 alive');
+                $responseTime = doubleval(substr(trim($data[17]), 0, 4));
 
             }
 
