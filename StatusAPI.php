@@ -4,10 +4,6 @@ namespace SweetCode\StatusAPI;
 
 class StatusAPI {
 
-    // All services ending with this part are NOT a HTTP service
-    private static $_UNIVERSE = '.universe.robertsspaceindustries.com';
-    private static $_UNIVERSE_LENGTH = 36;
-
     /**
      * @var array
      */
