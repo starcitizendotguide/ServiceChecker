@@ -85,6 +85,8 @@ class StatusAPI {
             $timeDiff = $c['timeDiff'];
             $downtime = $c['downtime'];
 
+            $serviceType = ServiceType::identify($link);
+
             // if
             //  the component is not enabled/active
             // then skip it
@@ -102,7 +104,10 @@ class StatusAPI {
             // if
             //  the service is just a normal HTTP service (can be determinated by the host)
             // then run curl check
-            if (!(substr($link, -self::$_UNIVERSE_LENGTH) === self::$_UNIVERSE)) {
+            if (
+                !($serviceType === ServiceType::PUBLIC_TEST_UNIVERSE_SERVICE) &&
+                !($serviceType === ServiceType::PUBLIC_UNIVERSE_SERVICE)
+            ) {
 
                 $curl = curl_init();
                 curl_setopt_array($curl, array(
@@ -148,20 +153,20 @@ class StatusAPI {
                 // if
                 //  the name starts with Webseed
                 // then we have 1 of 64 webseed services
-                if(substr($name, 0, 7) === 'Webseed') {
+                if($serviceType === ServiceType::WEBSEED) {
                     $webseedAvg = (($webseedAvg * $webseedCount) + $responseTime) / ($webseedCount + 1);
                     $webseedCount++;
                 }
                 // if
                 //  the name is Website
                 // then we update the metrics data for the website
-                else if($name === 'Website') {
+                else if($serviceType  === ServiceType::WEBSITE) {
                     $websiteAvg = $responseTime;
                 }
                 // if
                 //  the name is Public Universe
                 // then we update the data for the Public Universe
-                else if($name === 'Public Universe') {
+                else if($serviceType === ServiceType::PUBLIC_UNIVERSE_SERVICE) {
                     $publicUniverseAvg = $responseTime;
                 }
 
