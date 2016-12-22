@@ -129,7 +129,7 @@ class StatusAPI {
                 // ping
                 // -c 1 -> only one cycle
                 // -s   -> all details
-                exec('fping -c 1 -s ' . $host . ' 2>&1', $output, $result);
+                exec('fping -c 1 -s ' . escapeshellarg($host) . ' 2>&1', $output, $result);
 
                 // we need to get rid of old data in strdout; the length of "one" entry is 19 entries in one array (already tested that)
                 $data = array_slice($output, -19);
