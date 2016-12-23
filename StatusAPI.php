@@ -132,11 +132,13 @@ class StatusAPI {
                 // -s   -> all details
                 exec('fping -c 1 -s ' . escapeshellarg($host) . ' 2>&1', $output, $result);
 
-                // we need to get rid of old data in strdout; the length of "one" entry is 19 entries in one array (already tested that)
-                $data = array_slice($output, -19);
+                if(count($output) >= 19) {
+                    // we need to get rid of old data in strdout; the length of "one" entry is 19 entries in one array (already tested that)
+                    $data = array_slice($output, -19);
 
-                $available = (trim($data[5]) == '1 alive');
-                $responseTime = doubleval(substr(trim($data[17]), 0, 4));
+                    $available = (trim($data[4]) == '1 targets');
+                    $responseTime = doubleval(substr(trim($data[17]), 0, 4));
+                }
 
             }
 
@@ -337,7 +339,7 @@ class StatusAPI {
         // If
         //  the component is currently in cooldown mode
         //  the current status IS NOT OPERATIONAL
-        // then the issue occured agin.
+        // then the issue occurred again.
         else if(
             !($status === ServiceStatus::OPERATIONAL) &&
             $inCooldown
