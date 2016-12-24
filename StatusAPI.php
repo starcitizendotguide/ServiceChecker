@@ -211,7 +211,9 @@ class StatusAPI {
         // Multiply everything with 1000 to get the time in ms.
         $this->addMetricsPoint(1, $webseedAvg * 1000);
         $this->addMetricsPoint(2, $websiteAvg * 1000);
-        $this->addMetricsPoint(3, $publicUniverseAvg * 1000);
+        if($publicUniverseAvg !== 0) {
+            $this->addMetricsPoint(3, $publicUniverseAvg * 1000);
+        }
 
     }
 
