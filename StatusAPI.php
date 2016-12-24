@@ -132,12 +132,12 @@ class StatusAPI {
                 // -s   -> all details
                 exec('fping -c 1 -s ' . escapeshellarg($host) . ' 2>&1', $output, $result);
 
-                if(count($output) >= 19) {
+                if(count($output) >= 18) {
                     // we need to get rid of old data in strdout; the length of "one" entry is 19 entries in one array (already tested that)
-                    $data = array_slice($output, -19);
+                    $data = array_slice($output, -18);
 
-                    $available = (trim($data[4]) == '1 targets');
-                    $responseTime = doubleval(substr(trim($data[17]), 0, 4));
+                    $available = (trim($data[3]) == '1 targets');
+                    $responseTime = doubleval(substr(trim($data[16]), 0, 4));
                 }
 
             }
