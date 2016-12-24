@@ -125,19 +125,22 @@ class StatusAPI {
 
                 // cachet forces me to store all links with HTTP(s) at the beginnig,
                 // we need to get rid of this to use it as a valid host adress to ping at.
-                $host = substr($link, 7);
+                $host = parse_url($link, PHP_URL_HOST);
 
                 // ping
                 // -c 1 -> only one cycle
                 // -s   -> all details
-                exec('fping -c 1 -s ' . escapeshellarg($host) . ' 2>&1', $output, $result);
+                exec('tcpping -x 1 -C ' . escapeshellarg($host) . ' 2>&1', $output, $ignore);
 
-                if(count($output) >= 18) {
-                    // we need to get rid of old data in strdout; the length of "one" entry is 19 entries in one array (already tested that)
-                    $data = array_slice($output, -18);
+                if(is_array($output) && count($output)) {
 
-                    $available = (trim($data[3]) == '1 targets');
-                    $responseTime = doubleval(substr(trim($data[16]), 0, 4));
+                    $data = explode(' : ', array_slice($output, -1)[0]);
+
+                    if(count($data) === 2) {
+                        $available = true;
+                        $responseTime = intval($data[1]) / 1000; // convert to MS
+                    }
+
                 }
 
             }
